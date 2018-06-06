@@ -11,9 +11,9 @@ public class ElementsListener implements ActionListener{
     private int[][] ints;
     JPanel plansza;
     public ElementsListener(Element[][] el, int[][] w, JPanel p){
-        elemenst=el;
-        ints=w;
-        plansza=p;
+        this.elemenst=el;
+        this.ints=w;
+        this.plansza=p;
     }
 
     private boolean sprawdz(int a, boolean t){
@@ -102,56 +102,109 @@ public class ElementsListener implements ActionListener{
         return false;
     }
 
+    public Pozycja checkMove(int x, int y, int dx, int dy, int coSpradzic){
+        int ileZajetychPol = 0;
+        Pozycja pustePole = null;
+        for (int i = 0; i < 3; i++) {
+            if(ints[x][y] == coSpradzic){
+                ileZajetychPol ++;
+            }else if(ints[x][y] == 0){
+                pustePole = new Pozycja(x,y);
+            }
+            x += dx;
+            y += dy;
+        }
+
+        if (ileZajetychPol == 2 && pustePole != null){
+            return pustePole;
+        }
+
+        return null;
+    }
+
+    public boolean ruch(){
+        int[][] check = {
+                {0,0,1,0},
+                {0,1,1,0},
+                {0,2,1,0},
+                {0,0,0,1},
+                {1,0,0,1},
+                {2,0,0,1},
+                {0,0,1,1},
+                {0,2,1,-1}
+        };
+
+        for (int j = 2; j > 1; j--) {
+            for (int i = 0; i < check.length; i++) {
+                int[] rzad = check[i];
+                Pozycja p = checkMove(rzad[0], rzad[1], rzad[2], rzad[3], j);
+                if (p != null) {
+                    ints[p.x][p.y] = 2;
+                    elemenst[p.x][p.y].stan = 2;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
-    public void actionPerformed(ActionEvent e){
+    public void actionPerformed(ActionEvent e) {
         Element source = (Element) e.getSource();
-        int x=0, y=0;
-        boolean koniec=false;
+        int x = 0, y = 0;
+        boolean koniec = false;
 
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
-                if(elemenst[i][j] == source){
-                    x=i;
-                    y=j;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (elemenst[i][j] == source) {
+                    x = i;
+                    y = j;
                     break;
                 }
             }
         }
 
-        elemenst[x][y].stan=1;
-        ints[x][y]=1;
-        koniec=sprawdz(1, true);
+        if(elemenst[x][y].stan == 0) {
+            elemenst[x][y].stan = 1;
+            ints[x][y] = 1;
+            koniec = sprawdz(1, true);
 
-        if(koniec){
-            for(int i=0; i<3; i++){
-                for(int j=0; j<3; j++){
-                    elemenst[i][j].stan=0;
-                    ints[i][j]=0;
+
+            if (koniec) {
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        elemenst[i][j].stan = 0;
+                        ints[i][j] = 0;
+                    }
                 }
+                plansza.repaint();
             }
-            plansza.repaint();
+        }else{
+           return;
         }
 
-        Random rn = new Random();
-        int rn1=0, rn2=0;
-        int time=0;
-        if(koniec == false){
-            while(true){
-                time++;
-                rn1=rn.nextInt(3);
-                rn2=rn.nextInt(3);
-                if(time>70){
-                    koniec=true;
-                    break;
-                }
-                if(elemenst[rn1][rn2].stan == 0){
-                    elemenst[rn1][rn2].stan=2;
-                    ints[rn1][rn2]=2;
-                    break;
-                }
-                else{
-                    continue;
+        boolean zrobionyRuch = ruch();
+
+        if(zrobionyRuch == false) {
+            Random rn = new Random();
+            int rn1 = 0, rn2 = 0;
+            int time = 0;
+            if (koniec == false) {
+                while (true) {
+                    time++;
+                    rn1 = rn.nextInt(3);
+                    rn2 = rn.nextInt(3);
+                    if (time > 70) {
+                        koniec = true;
+                        break;
+                    }
+                    if (elemenst[rn1][rn2].stan == 0) {
+                        elemenst[rn1][rn2].stan = 2;
+                        ints[rn1][rn2] = 2;
+                        break;
+                    }
+
                 }
             }
         }
@@ -178,5 +231,13 @@ public class ElementsListener implements ActionListener{
             plansza.repaint();
             koniec=false;
         }
+    }
+}
+
+class Pozycja{
+    public int x, y;
+    public Pozycja(int x, int y){
+        this.x = x;
+        this.y = y;
     }
 }

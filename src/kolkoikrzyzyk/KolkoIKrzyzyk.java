@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+
 public class KolkoIKrzyzyk extends JFrame{
     public static void main(String[] args){
         KolkoIKrzyzyk kik = new KolkoIKrzyzyk();
